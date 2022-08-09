@@ -1,0 +1,184 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <!-- CSS only -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-gH2yIJqKdNHPEq0n4Mqa/HGKIhSkIHeL5AyhkYV8i59U5AR6csBvApHHNl/vI1Bx" crossorigin="anonymous">
+    <!-- JavaScript Bundle with Popper -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js" integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN" crossorigin="anonymous"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.min.js" integrity="sha384-+sLIOodYLS7CIrQpBjl+C7nPvqq+FbNUBDunl/OZv93DB7Ln/533i8e/mZXLi/P+" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-growl/1.0.6/bootstrap-growl.min.js"></script>
+
+    <link rel="stylesheet" href="{% static 'shop/style.css' %}">
+
+    <style>
+        .alert{
+            width: 500px;
+        }
+        .alert {
+            text-align: center;
+        }
+    </style>
+</head>
+
+
+<body>
+    <div>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fs-5">
+        <a class="navbar-brand fs-2" href="#" style="padding-left:31px;">Navbar</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+      
+        <div class="collapse navbar-collapse my-2" id="navbarSupportedContent">
+          <ul class="navbar-nav mr-auto">
+            <li class="nav-item active">
+              <a class="nav-link font-weight-bolder" href="#">Home <span class="sr-only ">(current)</span></a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#">Features</a>
+            </li>
+            <li class="nav-item">
+                <button id="cart" data-html="true" type="button" class="btn btn-dark" data-container="body" data-toggle="popover" data-placement="bottom" data-content="Bottom popover" style="font-size: inherit;" >
+                    Cart(0)
+                </button>
+            </li>
+            
+            <li class="nav-item">
+              <a class="nav-link disabled" href="#">Disabled</a>
+            </li>
+          </ul>
+          <form class="form-inline my-2 my-lg-0 mx-2" style="position: absolute;right: 90px;">
+            <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search" name="item_name">
+            <button class="btn btn-outline-success my-2 my-sm-0" type="submit" style="position: absolute;top: 0px;left: 209px;">Search</button>
+          </form>
+        </div>
+      </nav>
+    
+    <div class="container ">
+        <div id="liveAlertPlaceholder"></div>
+
+        <div class="row my-4">
+            {% for product in product_objects %}
+            <div class='col-md-4 mb-2'>
+               <div class="card shadow ">
+
+                <img src="{{product.image}}" alt="" class="card-img-top mx-auto my-5" style="height: 286px; width: 236px;">
+                <div class="card-body">
+                    <div id="nm{{product.id}}" class="card-title">{{product.title}}</div>
+                    <div class="card-text" id="price{{product.id}}">{{product.price}}
+                    </div>
+
+                    <a class='btn btn-warning' href={{product.id}}>View</a>
+                    <button id={{product.id}}  class='btn btn-warning atc' onclick="bootstrapAlert()">Add to cart </button>
+                </div>
+               </div>
+            </div>
+            {% endfor %}
+        </div>
+        <div class="row">
+            <div class="col-md-3 offset-md-4">
+                <ul class="pagination">
+                    {% if product_objects.has_previous %}
+                    <li class='page-item '>
+                        <a class='page-link 'href="?page={{product_objects.previous_page_number}}">Previous</a>
+                    </li>
+                    {% endif %}
+                    <li class='ps-3 pe-3'>
+                        page {{product_objects.number}} of {{product_objects.paginator.num_pages}}
+                    {% if product_objects.has_next %}
+                    </li>
+                    
+                    <li class="page-item">
+                        <a href="?page={{product_objects.next_page_number}}">Next</a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </div>
+    
+</body>
+<script type='text/javascript'>
+
+    function bootstrapAlert(){
+        $.growl({
+            message: 'your item added to the cart'
+        }, {
+            position: {
+                from: "top",
+                align: "center"
+            },
+            allow_dismiss: false,
+            delay: 1000,
+            
+        });
+    }
+
+
+    
+    if(localStorage.getItem('cart')==null){
+        var cart = {};
+    }
+    else{
+        cart = JSON.parse(localStorage.getItem('cart'))
+    }
+    
+    $(document).on('click', '.atc', function(){
+        
+
+
+
+
+
+
+        var item_id = this.id.toString();
+        console.log(item_id)
+
+        if (cart[item_id] != undefined){
+            quantity = cart[item_id][0] + 1
+            cart[item_id][0] = quantity
+            cart[item_id][2] = cart[item_id][2]+parseFloat(document.getElementById("price"+item_id).innerHTML)
+        }
+        else{
+            quantity = 1
+            name = document.getElementById("nm"+item_id).innerHTML
+            cart[item_id] = [1, name, parseFloat(document.getElementById("price"+item_id).innerHTML)];
+
+        }
+        console.log(cart)
+        localStorage.setItem('cart', JSON.stringify(cart));
+        document.getElementById("cart").innerHTML = "Cart  ("+Object.keys(cart).length+")";
+    });
+  
+   
+
+    DisplayCart(cart);
+    function DisplayCart(cart){
+        var cartstr = "";
+        cartstr = "<h5>This is your Cart</h5>"
+        let cartObject = JSON.parse(localStorage.getItem('cart'))
+        for(item in cartObject){
+            cartstr += cartObject[item][1] + "qty: " + cartObject[item][0] + " </br>";
+
+        }
+        cartstr += "<a href='/checkout' class='btn btn-warning' id='checkout'>Checkout</a>"
+        document.getElementById("cart").setAttribute('data-content', cartstr);
+        $('[data-toggle="popover"]').popover();
+    }
+</script>
+
+</html>
+
+
+
+
+
+
+
+
